@@ -1,5 +1,7 @@
 # Concussion Risk ML Project
 
+Go to 'Code" to view with formatting.
+
 1/6/2024
 1. Removed PCS1-22 and MFQ1-33 since the ML model was cheating/overfitting since it could add up scores for both evaluation metrics and that would get you the PCS and MFQ severity score
 2. Reran the regressions to get the following: PCS Model - MAE: 10.88, RMSE: 17.16, R²: 0.46
