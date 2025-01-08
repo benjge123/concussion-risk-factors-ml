@@ -208,49 +208,78 @@ import seaborn as sns
 ##print(f"Correlation between PCS and MFQ: {correlation:.4f}")
 
 
-# Residual Plot (Checking Model Assumptions)
-plt.figure(figsize=(6, 5))
-residuals = y_test_pcs - y_pred_pcs
-sns.scatterplot(x=y_pred_pcs, y=residuals, alpha=0.6)
-plt.axhline(y=0, color='red', linestyle='--')
-plt.title("Residual Plot")
-plt.xlabel("Predicted PCS Severity")
-plt.ylabel("Residuals")
-plt.show()
-
-# Predicted vs. Actual Plot
-plt.figure(figsize=(6, 5))
-sns.scatterplot(x=y_test_pcs, y=y_pred_pcs, alpha=0.6)
-plt.plot([y_test_pcs.min(), y_test_pcs.max()], [y_test_pcs.min(), y_test_pcs.max()], 'r--')  # 45-degree reference line
-plt.title("Predicted vs. Actual PCS Severity")
-plt.xlabel("Actual PCS Severity")
-plt.ylabel("Predicted PCS Severity")
-plt.show()
-
-# Feature Importance Bar Chart
+### Residual Plot (Checking Model Assumptions)
+##plt.figure(figsize=(6, 5))
+##residuals = y_test_pcs - y_pred_pcs
+##sns.scatterplot(x=y_pred_pcs, y=residuals, alpha=0.6)
+##plt.axhline(y=0, color='red', linestyle='--')
+##plt.title("Residual Plot")
+##plt.xlabel("Predicted PCS Severity")
+##plt.ylabel("Residuals")
+##plt.show()
+##
+### Predicted vs. Actual Plot
+##plt.figure(figsize=(6, 5))
+##sns.scatterplot(x=y_test_pcs, y=y_pred_pcs, alpha=0.6)
+##plt.plot([y_test_pcs.min(), y_test_pcs.max()], [y_test_pcs.min(), y_test_pcs.max()], 'r--')  # 45-degree reference line
+##plt.title("Predicted vs. Actual PCS Severity")
+##plt.xlabel("Actual PCS Severity")
+##plt.ylabel("Predicted PCS Severity")
+##plt.show()
+##
+### Feature Importance Bar Chart
+##plt.figure(figsize=(8, 5))
+##sns.barplot(x=feature_importance.values, y=feature_importance.index, palette="viridis")
+##plt.title("Feature Importance (Higher = More Impact on PCS Severity)")
+##plt.xlabel("Importance Score (Absolute Regression Coefficients)")
+##plt.ylabel("Feature")
+##plt.show()
+##
+##
+##
+# Plot the distribution of PCS Severity Scores. This shows 43 have a score of 0 and very few have scores past 60.
 plt.figure(figsize=(8, 5))
-sns.barplot(x=feature_importance.values, y=feature_importance.index, palette="viridis")
-plt.title("Feature Importance (Higher = More Impact on PCS Severity)")
-plt.xlabel("Importance Score (Absolute Regression Coefficients)")
-plt.ylabel("Feature")
+sns.histplot(y_train_pcs, bins=20, kde=True)
+plt.title("PCS Severity Score Distribution (Before Resampling)")
+plt.xlabel("PCS Severity Score")
+plt.ylabel("Frequency")
 plt.show()
 
+from imblearn.over_sampling import SMOTE
 import numpy as np
 
-# Apply log transformation to the target variable
-y_train_log = np.log1p(y_train_pcs)  # log1p(x) = log(x+1) to handle zeros
-y_test_log = np.log1p(y_test_pcs)
+# Define severe PCS threshold
+severe_threshold = 40
 
-# Train the regression again
-linear_pcs.fit(X_train_pcs, y_train_log)
+# Identify severe cases (PCS > 40)
+severe_cases_mask = y_train_pcs > severe_threshold
 
-# Predict and transform back
-y_pred_log = linear_pcs.predict(X_test_pcs)
-y_pred_pcs = np.expm1(y_pred_log)  # Reverse the log transformation
+# Count severe cases
+severe_cases_count = severe_cases_mask.sum()
+
+# Define SMOTE with sampling only on severe cases
+smote = SMOTE(sampling_strategy={1: severe_cases_count * 5}, random_state=42, k_neighbors=1)
+
+# Convert to binary target (1 = severe, 0 = not severe)
+y_train_binary = severe_cases_mask.astype(int)
+
+# Apply SMOTE **only to severe cases**
+X_train_resampled, y_train_resampled_binary = smote.fit_resample(X_train_pcs, y_train_binary)
+
+# Convert resampled labels back to original PCS values
+y_train_resampled = np.where(y_train_resampled_binary == 1, np.random.randint(40, 90, size=len(y_train_resampled_binary)), y_train_pcs.mean())
+
+# Plot the new distribution
+plt.figure(figsize=(8, 5))
+sns.histplot(y_train_resampled, bins=20, kde=True)
+plt.title("PCS Severity Score Distribution (After Corrected Oversampling)")
+plt.xlabel("PCS Severity Score")
+plt.ylabel("Frequency")
+plt.show()
 
 
 
 
 
-    
+
 
