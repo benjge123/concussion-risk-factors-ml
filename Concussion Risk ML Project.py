@@ -1,6 +1,21 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.utils import resample
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+import statsmodels.api as sm
+from sklearn.linear_model import Ridge, Lasso
+from sklearn.model_selection import GridSearchCV
+from sklearn.tree import DecisionTreeRegressor
+import sklearn
+from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import RandomForestRegressor
+
 
 # Finds long file path, rip
 file_path = r"C:\Users\思庭\AppData\Local\Programs\Python\Python313\dataverse_files tbi Dec 2024 ML Project\Cleaned_Data.xlsx"
@@ -62,7 +77,7 @@ X_train_pcs, X_test_pcs, y_train_pcs, y_test_pcs = train_test_split(X, y_pcs, te
 # Train-test split for MFQ model
 #X_train_mfq, X_test_mfq, y_train_mfq, y_test_mfq = train_test_split(X, y_mfq, test_size=0.2, random_state=42)
 
-from sklearn.linear_model import LinearRegression
+
 
 # Initialize models
 linear_pcs = LinearRegression()
@@ -79,8 +94,8 @@ linear_pcs.fit(X_train_pcs, y_train_pcs)
 ##df[columns_to_plot].hist(bins=30, figsize=(16, 12))
 ##plt.show()
 
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import numpy as np
+
+
 
 # Predict on test set
 y_pred_pcs = linear_pcs.predict(X_test_pcs)
@@ -97,10 +112,10 @@ r2_pcs = r2_score(y_test_pcs, y_pred_pcs)
 ##r2_mfq = r2_score(y_test_mfq, y_pred_mfq)
 
 # Print results
-print(f"PCS Model - MAE: {mae_pcs:.2f}, RMSE: {rmse_pcs:.2f}, R²: {r2_pcs:.2f}")
+#print(f"PCS Model - MAE: {mae_pcs:.2f}, RMSE: {rmse_pcs:.2f}, R²: {r2_pcs:.2f}")
 #print(f"MFQ Model - MAE: {mae_mfq:.2f}, RMSE: {rmse_mfq:.2f}, R²: {r2_mfq:.2f}")
 
-import statsmodels.api as sm
+
 
 ### Add a constant (intercept) for OLS analysis
 ##X_train_pcs_const = sm.add_constant(X_train_pcs)
@@ -111,15 +126,15 @@ import statsmodels.api as sm
 ### Print summary
 ##print(ols_model.summary())
 ##
-print("PCS Train R²:", linear_pcs.score(X_train_pcs, y_train_pcs)) # Prints PCS training r^2
-print("PCS Test R²:", linear_pcs.score(X_test_pcs, y_test_pcs))    # Prints PCS testing r^2
+##print("PCS Train R²:", linear_pcs.score(X_train_pcs, y_train_pcs)) # Prints PCS training r^2
+##print("PCS Test R²:", linear_pcs.score(X_test_pcs, y_test_pcs))    # Prints PCS testing r^2
 
 ##print("MFQ Train R²:", linear_mfq.score(X_train_pcs, y_train_pcs)) # Prints PCS training r^2
 ##print("MFQ Test R²:", linear_mfq.score(X_test_pcs, y_test_pcs))    # Prints PCS testing r^2
 
 
 
-from statsmodels.stats.outliers_influence import variance_inflation_factor
+
 
 # Compute VIF for each feature. Tests for multicolinearity.
 ##vif_data = pd.DataFrame()
@@ -127,9 +142,8 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 ##vif_data["VIF"] = [variance_inflation_factor(X_train_pcs.values, i) for i in range(X_train_pcs.shape[1])]
 ##print(vif_data)
 ##
-##from sklearn.linear_model import Ridge, Lasso
-##from sklearn.model_selection import GridSearchCV
 
+### Start of Ridege/Lasso Regression
 ### Define the alphas (regularization strengths) to test
 ##alphas = [0.001, 0.01, 0.1, 1, 10, 100]
 ##
@@ -171,18 +185,18 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 ##print(lasso_coefficients[lasso_coefficients == 0].index.tolist())
 
 
-# Get the absolute values of the coefficients to compare them to each other for feature importance 
-feature_importance = pd.Series(np.abs(linear_pcs.coef_), index=X_train_pcs.columns)
+### Get the absolute values of the coefficients to compare them to each other for feature importance 
+##feature_importance = pd.Series(np.abs(linear_pcs.coef_), index=X_train_pcs.columns)
+##
+### Sort by importance
+##feature_importance = feature_importance.sort_values(ascending=False)
+##
+### Display feature importance
+##print("Feature Importance (Higher = More Impact on PCS Severity):")
+##print(feature_importance)
 
-# Sort by importance
-feature_importance = feature_importance.sort_values(ascending=False)
-
-# Display feature importance
-print("Feature Importance (Higher = More Impact on PCS Severity):")
-print(feature_importance)
 
 
-import seaborn as sns
 
 ### Compute correlation matrix. Checking to see why age had such high multi collinearity since I didn't see why conceptually. Could not find an answer.
 ##correlation_matrix = X_train_pcs.corr()
@@ -208,32 +222,32 @@ import seaborn as sns
 ##print(f"Correlation between PCS and MFQ: {correlation:.4f}")
 
 
-# Residual Plot (Checking Model Assumptions)
-plt.figure(figsize=(6, 5))
-residuals = y_test_pcs - y_pred_pcs
-sns.scatterplot(x=y_pred_pcs, y=residuals, alpha=0.6)
-plt.axhline(y=0, color='red', linestyle='--')
-plt.title("Residual Plot")
-plt.xlabel("Predicted PCS Severity")
-plt.ylabel("Residuals")
-plt.show()
-
-# Predicted vs. Actual Plot
-plt.figure(figsize=(6, 5))
-sns.scatterplot(x=y_test_pcs, y=y_pred_pcs, alpha=0.6)
-plt.plot([y_test_pcs.min(), y_test_pcs.max()], [y_test_pcs.min(), y_test_pcs.max()], 'r--')  # 45-degree reference line
-plt.title("Predicted vs. Actual PCS Severity")
-plt.xlabel("Actual PCS Severity")
-plt.ylabel("Predicted PCS Severity")
-plt.show()
-
-# Feature Importance Bar Chart
-plt.figure(figsize=(8, 5))
-sns.barplot(x=feature_importance.values, y=feature_importance.index, palette="viridis")
-plt.title("Feature Importance (Higher = More Impact on PCS Severity)")
-plt.xlabel("Importance Score (Absolute Regression Coefficients)")
-plt.ylabel("Feature")
-plt.show()
+### Residual Plot (Checking Model Assumptions)
+##plt.figure(figsize=(6, 5))
+##residuals = y_test_pcs - y_pred_pcs
+##sns.scatterplot(x=y_pred_pcs, y=residuals, alpha=0.6)
+##plt.axhline(y=0, color='red', linestyle='--')
+##plt.title("Residual Plot")
+##plt.xlabel("Predicted PCS Severity")
+##plt.ylabel("Residuals")
+##plt.show()
+##
+### Predicted vs. Actual Plot
+##plt.figure(figsize=(6, 5))
+##sns.scatterplot(x=y_test_pcs, y=y_pred_pcs, alpha=0.6)
+##plt.plot([y_test_pcs.min(), y_test_pcs.max()], [y_test_pcs.min(), y_test_pcs.max()], 'r--')  # 45-degree reference line
+##plt.title("Predicted vs. Actual PCS Severity")
+##plt.xlabel("Actual PCS Severity")
+##plt.ylabel("Predicted PCS Severity")
+##plt.show()
+##
+### Feature Importance Bar Chart
+##plt.figure(figsize=(8, 5))
+##sns.barplot(x=feature_importance.values, y=feature_importance.index, palette="viridis")
+##plt.title("Feature Importance (Higher = More Impact on PCS Severity)")
+##plt.xlabel("Importance Score (Absolute Regression Coefficients)")
+##plt.ylabel("Feature")
+##plt.show()
 ##
 ##
 ##
@@ -245,11 +259,7 @@ plt.show()
 ##plt.ylabel("Frequency")
 ##plt.show()
 ##
-##import numpy as np
-##import pandas as pd
-##from sklearn.utils import resample
-##import seaborn as sns
-##import matplotlib.pyplot as plt
+
 ##
 ### Define severity threshold
 ##severe_threshold = 40
@@ -283,6 +293,184 @@ plt.show()
 
 
 
+# Function to train a Decision Tree model
+def train_decision_tree(X_train, y_train, max_depth=None, min_samples_split=2, min_samples_leaf=1):
+    """
+    Trains a Decision Tree Regressor and returns the trained model.
+    
+    Parameters:
+        X_train (DataFrame): Training feature set.
+        y_train (Series): Training target variable.
+        max_depth (int, optional): Maximum depth of the tree. Defaults to None (fully grown tree).
+        min_samples_split (int, optional): Minimum samples required to split a node. Defaults to 2.
+        min_samples_leaf (int, optional): Minimum samples required in a leaf node. Defaults to 1.
+
+    Returns:
+        model (DecisionTreeRegressor): Trained Decision Tree model.
+    """
+    model = DecisionTreeRegressor(
+        max_depth=max_depth, 
+        min_samples_split=min_samples_split, 
+        min_samples_leaf=min_samples_leaf, 
+        random_state=42
+    )
+    model.fit(X_train, y_train)
+    return model
+
+# Function to train Decision Tree with Cross validation
+def cross_validate_decision_tree(X, y, max_depth=3, min_samples_split=10, min_samples_leaf=5, cv=5):
+    """Performs K-Fold cross-validation on a Decision Tree model."""
+    
+    model = DecisionTreeRegressor(
+        max_depth=max_depth,
+        min_samples_split=min_samples_split,
+        min_samples_leaf=min_samples_leaf,
+        random_state=42
+    )
+    
+    # Perform K-Fold Cross-Validation (default cv=5)
+    scores = cross_val_score(model, X, y, cv=cv, scoring="r2")  # R² score for each fold
+    
+    print(f"Cross-Validation R² Scores: {scores}")
+    print(f"Mean R²: {np.mean(scores):.2f}")
+    print(f"Standard Deviation of R²: {np.std(scores):.2f}")
+    
+    return scores
+
+
+
+# Function to evaluate the model
+def evaluate_model(model, X_test, y_test):
+    """
+    Evaluates a trained model and prints performance metrics.
+    
+    Parameters:
+        model: Trained model (DecisionTreeRegressor or other regressors).
+        X_test (DataFrame): Test feature set.
+        y_test (Series): Actual target values.
+    
+    Returns:
+        metrics (dict): Dictionary of evaluation metrics.
+    """
+    y_pred = model.predict(X_test)
+    mae = mean_absolute_error(y_test, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    r2 = r2_score(y_test, y_pred)
+
+##    print(f"Model Evaluation Metrics:")
+##    print(f"MAE: {mae:.2f}")
+##    print(f"RMSE: {rmse:.2f}")
+##    print(f"R²: {r2:.2f}")
+
+    return {"MAE": mae, "RMSE": rmse, "R²": r2}
+
+# Function to plot feature importance
+def plot_feature_importance(model, feature_names):
+    """
+    Plots the feature importance of a trained Decision Tree model.
+    
+    Parameters:
+        model: Trained DecisionTreeRegressor model.
+        feature_names (list): List of feature names from the dataset.
+    """
+    
+    importance = model.feature_importances_
+    sorted_idx = importance.argsort()[::-1]  # Sort in descending order
+
+##    plt.figure(figsize=(8, 5))
+##    sns.barplot(x=importance[sorted_idx], y=[feature_names[i] for i in sorted_idx], palette="viridis")
+##    plt.title("Feature Importance - Decision Tree")
+##    plt.xlabel("Importance Score")
+##    plt.ylabel("Feature")
+##    plt.show()
+
+
+### Train Decision Tree Model
+##dt_model = train_decision_tree(X_train_pcs, y_train_pcs, max_depth=5, min_samples_split=5, min_samples_leaf=2)
+##
+### Evaluate Decision Tree Model
+##dt_metrics = evaluate_model(dt_model, X_test_pcs, y_test_pcs)
+##
+### Plot Feature Importance
+##plot_feature_importance(dt_model, X_train_pcs.columns)
+
+##def tune_decision_tree(X, y):
+##    """Finds the best Decision Tree parameters using GridSearchCV."""
+##    
+##    param_grid = {
+##        "max_depth": [3, 4, 5, 6], 
+##        "min_samples_split": [5, 10, 15],  
+##        "min_samples_leaf": [2, 5, 10]  
+##    }
+##    
+##    model = DecisionTreeRegressor(random_state=42)
+##    grid_search = GridSearchCV(model, param_grid, cv=5, scoring="r2", n_jobs=-1)
+##    grid_search.fit(X, y)
+##    
+##    print(f"Best Parameters: {grid_search.best_params_}")
+##    return grid_search.best_estimator_
+##
+### Run hyperparameter tuning
+##best_tree = tune_decision_tree(X_train_pcs, y_train_pcs)
+##
+### Evaluate the tuned model
+##evaluate_model(best_tree, X_test_pcs, y_test_pcs)
+##
+##
+# Run Cross-Validation Before Training Final Model
+print("\nRunning Cross-Validation for Decision Tree:")
+cross_validate_decision_tree(X_train_pcs, y_train_pcs, cv=5)
+
+# Train Decision Tree Model (After Cross-Validation)
+dt_model = train_decision_tree(X_train_pcs, y_train_pcs, max_depth=5, min_samples_split=5, min_samples_leaf=2)
+
+# Evaluate Decision Tree Model on Test Set
+dt_metrics = evaluate_model(dt_model, X_test_pcs, y_test_pcs)
+
+# Plot Feature Importance
+plot_feature_importance(dt_model, X_train_pcs.columns)
+
+
+def train_random_forest(X_train, y_train, max_depth=3, min_samples_split=5, min_samples_leaf=10, n_estimators=100):
+    """
+    Trains a Random Forest Regressor and returns the trained model.
+
+    Parameters:
+        X_train (DataFrame): Training feature set.
+        y_train (Series): Training target variable.
+        max_depth (int): Maximum depth of each tree.
+        min_samples_split (int): Minimum samples required to split a node.
+        min_samples_leaf (int): Minimum samples required in a leaf node.
+        n_estimators (int): Number of trees in the forest.
+
+    Returns:
+        model (RandomForestRegressor): Trained Random Forest model.
+    """
+    model = RandomForestRegressor(
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+        min_samples_split=min_samples_split,
+        min_samples_leaf=min_samples_leaf,
+        random_state=42,
+        n_jobs=-1  # Uses all available processors
+    )
+    model.fit(X_train, y_train)
+    return model
+
+# Train the Random Forest Model
+rf_model = train_random_forest(X_train_pcs, y_train_pcs)
+
+# Evaluate the Random Forest Model on Test Data
+rf_metrics = evaluate_model(rf_model, X_test_pcs, y_test_pcs)
+
+from sklearn.model_selection import cross_val_score
+
+# Run Cross-Validation on Random Forest
+rf_scores = cross_val_score(rf_model, X_train_pcs, y_train_pcs, cv=5, scoring="r2")
+
+print(f"Random Forest Cross-Validation R² Scores: {rf_scores}")
+print(f"Mean R²: {np.mean(rf_scores):.2f}")
+print(f"Standard Deviation of R²: {np.std(rf_scores):.2f}")
 
 
 

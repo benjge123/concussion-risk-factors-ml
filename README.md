@@ -24,6 +24,11 @@ Go to 'Code" to view with formatting.
 	Sex					4.76
 	# of Prior Depressive Episodes		0.27
 11. Created a residual plot and saw that my regression model struggled to predict severe cases. No surprise since there are only three cases with a PCS score higher than 80. The max score is 132. Tried SMOTE resampling to help with oversampling. I then realized there were 43 cases where the PCS score was 0, so I tried undersampling too. I got a little stuck here because I don't know what a properly over and undersampled case is supposed to look like for this data. I think if I solve the resampling issue, I can fix the heteroskedascity issue where most of the cases are aggregated in the low PCS score area
+12. Started on my decision tree model MAE: 9.91, RMSE: 19.34, R²: 0.31. So far it's not better than the linear regression.
+13. Tried cross validation on the DT to see what would happen. R^2 dropped to 0.14, once again reinforcing that my model is overfitting.
+
+
+12. I just realized that you recommend I create a separate file with plots from my models, right?
 
 
 
@@ -33,4 +38,5 @@ To Consider Later
 2. Answer "Does history of concussion, anxiety, depression, lead to worse PCS?
 3. "So given your answers to your past medical history, PCS, and MFQ scores, here's a loose projection of what your near future could look like" - if this model were to be turned into a tool to be used in practice, this is a situation where it could help a patient have a more detailed understanding of their next few weeks. It beats "try to rest and cross your fingers you get better" 
 4. Should I remove the cases where PCS = 0? There's 43/155 who do not have and Post Concussion Sypmtoms, so I wonder if it's making my model worse by have the largest population of the data be people with 0 symptoms. I am also unsure if my SMOTE over sampling is working the way it should....
+5. Is it bad that MFQ cut off is included since MFQ scores has a 0.78 with PCS scores? If removed, r^2 drops to ~0.11, far worse than ~0.5
 
