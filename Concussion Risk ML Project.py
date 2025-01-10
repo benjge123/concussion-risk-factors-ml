@@ -283,7 +283,7 @@ r2_pcs = r2_score(y_test_pcs, y_pred_pcs)
 ##X_train_resampled = pd.concat([non_severe_cases, severe_cases_resampled])
 ##y_train_resampled = pd.concat([non_severe_labels, severe_labels_resampled])
 ##
-### --- Step 2: Plot the Final Resampled Distribution ---
+### 
 ##plt.figure(figsize=(8, 5))
 ##sns.histplot(y_train_resampled, bins=20, kde=True)
 ##plt.title("PCS Severity Score Distribution (After Bootstrap Resampling)")
@@ -291,7 +291,7 @@ r2_pcs = r2_score(y_test_pcs, y_pred_pcs)
 ##plt.ylabel("Frequency")
 ##plt.show()
 
-
+##################################### Decsion Tree Model ##################################
 
 # Function to train a Decision Tree model
 def train_decision_tree(X_train, y_train, max_depth=None, min_samples_split=2, min_samples_leaf=1):
@@ -384,7 +384,7 @@ def plot_feature_importance(model, feature_names):
 ##    plt.ylabel("Feature")
 ##    plt.show()
 
-
+################################ Tuning DT Parameters + Cross Validation #########################
 ### Train Decision Tree Model
 ##dt_model = train_decision_tree(X_train_pcs, y_train_pcs, max_depth=5, min_samples_split=5, min_samples_leaf=2)
 ##
@@ -430,6 +430,7 @@ dt_metrics = evaluate_model(dt_model, X_test_pcs, y_test_pcs)
 # Plot Feature Importance
 plot_feature_importance(dt_model, X_train_pcs.columns)
 
+################################# Random Forest Model w/ Cross Validation #############################################
 
 def train_random_forest(X_train, y_train, max_depth=3, min_samples_split=5, min_samples_leaf=10, n_estimators=100):
     """
