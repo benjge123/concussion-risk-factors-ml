@@ -13,11 +13,12 @@ from sklearn.model_selection import train_test_split
 #from sklearn.utils import resample
 #import statsmodels.api as sm
 #from statsmodels.stats.outliers_influence import variance_inflation_factor
+from sklearn.preprocessing import PolynomialFeatures
 
 
 ################################################################################
 
-def read_data( file_path, plot_histogram=None, verbose=False):
+def read_data( file_path, plot_histogram=None, verbose=False): 
     """
     Reads data file & performs data cleaning.
     
@@ -313,7 +314,7 @@ def importance(linear_pcs, X_train_pcs, plot_importance=None):
 ################################################################################
 
 def correlation(X_train_pcs, plot_correlation=None):
-    """
+    """ 
     """
     # Compute correlation matrix. Checking to see why age had such high multi
     # collinearity. Could not find an answer.
@@ -384,14 +385,70 @@ def correlation(X_train_pcs, plot_correlation=None):
 
 ################################################################################
 
+#def polynomial_regression(X_train, X_test, y_train, y_test, degrees=[1, 2, 5]):  This part has crashed and burned. I give up on turning it into a defined function for now.
+    """
+    Performs Polynomial Regression for multiple polynomial degrees and visualizes the results.
+
+    Parameters:
+    - X_train: Training feature set
+    - X_test: Testing feature set
+    - y_train: Training target variable (PCS Severity)
+    - y_test: Testing target variable (PCS Severity)
+    - degrees: List of polynomial degrees to test (default = [1, 2, 20])
+
+    Returns:
+    - Prints MSE scores for train and test sets
+    - Displays Predicted vs. Actual scatter plots for each polynomial degree
+    """
+    plt.figure(figsize=(15, 5))
+
+    for i, degree in enumerate(degrees):
+        # Transform features into polynomial form
+        X_train = X_train.to_numpy().reshape(-1, 1)
+        X_test = X_test.to_numpy().reshape(-1, 1)
+
+        poly = PolynomialFeatures(degree=degree)
+        X_poly_train = poly.fit_transform(X_train)
+        X_poly_test = poly.transform(X_test)
+
+        # Creating the model
+        model = LinearRegression()
+        
+        # Train Polynomial Regression Model
+        model.fit(X_poly_train, y_train)    
+
+        # Evaluating the model  
+        y_pred_train = model.predict(X_poly_train)
+        y_pred_test = model.predict(X_poly_test)
+
+        # Compute Mean Squared Error
+        train_mse = mean_squared_error(y_train, y_pred_train)
+        test_mse = mean_squared_error(y_test, y_pred_test)
+
+        # Plot Predicted vs. Actual PCS Severity
+        plt.subplot(1, len(degrees), i + 1)
+        plt.scatter(y_train, y_pred_train, color='blue', alpha=0.5, label="Train Data")
+        plt.scatter(y_test, y_pred_test, color='red', alpha=0.5, label="Test Data")
+        plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'g--', label="Perfect Fit")
+
+        plt.title(f'Degree={degree}\nTrain MSE={train_mse:.2f}, Test MSE={test_mse:.2f}')
+        plt.xlabel("Actual PCS Severity")
+        plt.ylabel("Predicted PCS Severity")
+        plt.legend()
+
+        # Print MSE Scores
+        print(f"Polynomial Regression (Degree {degree}) - Train MSE: {train_mse:.2f}, Test MSE: {test_mse:.2f}")
+
+    plt.show()
+
 def main():
     # DEFINE DATA / PLOT LOCATIONS
     PROJECT_DIR = r"C:\Users\思庭\AppData\Local\Programs\Python\Python313\dataverse_files tbi Dec 2024 ML Project"
     DATA_FILE = "Cleaned_Data.xlsx"
     DATA_PATH = os.path.join(PROJECT_DIR, DATA_FILE)
 
-    print("Checking file path:", DATA_PATH)
-    print("File exists:", os.path.exists(DATA_PATH))  # Debugging step
+##    print("Checking file path:", DATA_PATH)
+##    print("File exists:", os.path.exists(DATA_PATH))  # Debugging step
 
     if not os.path.exists(DATA_PATH):
         print("❌ ERROR: The file path is incorrect or the file does not exist!")
@@ -405,10 +462,15 @@ def main():
     X_test_pcs, y_test_pcs,  y_pred_pcs = predict_LR(X, y_pcs)
 
     # Evaluates the performance of the predictions from the linear regressions
-    evaluate(linear_pcs, X_train_pcs, y_train_pcs,
-             X_test_pcs, y_test_pcs,  y_pred_pcs)
+##    evaluate(linear_pcs, X_train_pcs, y_train_pcs,
+##             X_test_pcs, y_test_pcs,  y_pred_pcs)
+    
+    # Run Polynomial Regression for degrees 1, 2, and 3
+    polynomial_regression(X_train_pcs, X_test_pcs, y_train_pcs, y_test_pcs, degrees=[1, 2, 5])
+
 
 #################################################################################
 
-if __name__ == "__main__":
-    main()
+##if __name__ == "__main__":
+##    main()
+

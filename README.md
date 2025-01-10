@@ -26,7 +26,10 @@ Go to 'Code" to view with formatting.
 11. Created a residual plot and saw that my regression model struggled to predict severe cases. No surprise since there are only three cases with a PCS score higher than 80. The max score is 132. Tried SMOTE resampling to help with oversampling. I then realized there were 43 cases where the PCS score was 0, so I tried undersampling too. I got a little stuck here because I don't know what a properly over and undersampled case is supposed to look like for this data. I think if I solve the resampling issue, I can fix the heteroskedascity issue where most of the cases are aggregated in the low PCS score area
 12. Started on my decision tree model MAE: 9.91, RMSE: 19.34, R²: 0.31. So far it's not better than the linear regression.
 13. Tried cross validation on the DT to see what would happen. R^2 dropped to 0.14, once again reinforcing that my model is overfitting.
-
+14. Moved onto a random forest. Given the overfitting on a small dataset, I doubt random forests would perform better but I have nothing better to do. 
+15. No surprise, it has the same r^2. Standard deviation for the RF model went from 0.62->0.08 when compared with the DT model so that's an improvement.
+16. Started on polynomial regression to help see the bias-variance tradeoff and find what degree polynomial results in the best polynomial regression.
+17. 
 
 12. I just realized that you recommend I create a separate file with plots from my models, right?
 
