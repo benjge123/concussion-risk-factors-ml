@@ -30,6 +30,8 @@ Go to 'Code" to view with formatting.
 15. No surprise, it has the same r^2. Standard deviation for the RF model went from 0.62->0.08 when compared with the DT model so that's an improvement.
 16. Started on polynomial regression to help see the bias-variance tradeoff and find what degree polynomial results in the best polynomial regression.
 17. Got stuck on if my polynomial regression model is correct.
+18. Finished my LOOCV function, i think. Have yet to test it.
+19. Got a new laptop, do I need to add this laptop to GitHub or something?
 
 
 12. I just realized that you recommend I create a separate file with plots from my models, right?

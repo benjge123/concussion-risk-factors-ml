@@ -15,6 +15,8 @@ from sklearn.tree import DecisionTreeRegressor
 import sklearn
 from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import RandomForestRegressor
+import sys
+import os
 
 
 # Finds long file path, rip
@@ -291,10 +293,35 @@ r2_pcs = r2_score(y_test_pcs, y_pred_pcs)
 ##plt.ylabel("Frequency")
 ##plt.show()
 
+# Function to evaluate the model
+def evaluate_model(model, X_test, y_test):
+    """
+    Evaluates a trained model and prints performance metrics.
+    
+    Parameters:
+        model: Trained model (DecisionTreeRegressor or other regressors).
+        X_test (DataFrame): Test feature set.
+        y_test (Series): Actual target values.
+    
+    Returns:
+        metrics (dict): Dictionary of evaluation metrics.
+    """
+    y_pred = model.predict(X_test)
+    mae = mean_absolute_error(y_test, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    r2 = r2_score(y_test, y_pred)
+
+    print(f"Model Evaluation Metrics:")
+    print(f"MAE: {mae:.2f}")
+    print(f"RMSE: {rmse:.2f}")
+    print(f"R²: {r2:.2f}")
+
+    return {"MAE": mae, "RMSE": rmse, "R²": r2}
+
 ##################################### Decsion Tree Model ##################################
 
 # Function to train a Decision Tree model
-def train_decision_tree(X_train, y_train, max_depth=None, min_samples_split=2, min_samples_leaf=1):
+def train_decision_tree(X_train_pcs, y_train_pcs, max_depth=None, min_samples_split=2, min_samples_leaf=1):
     """
     Trains a Decision Tree Regressor and returns the trained model.
     
@@ -314,55 +341,16 @@ def train_decision_tree(X_train, y_train, max_depth=None, min_samples_split=2, m
         min_samples_leaf=min_samples_leaf, 
         random_state=42
     )
-    model.fit(X_train, y_train)
+    model.fit(X_train_pcs, y_train_pcs)
     return model
+# Train the Decision Tree Model
+dt_model = train_decision_tree(X_train_pcs, y_train_pcs, max_depth=3)
 
-# Function to train Decision Tree with Cross validation
-def cross_validate_decision_tree(X, y, max_depth=3, min_samples_split=10, min_samples_leaf=5, cv=5):
-    """Performs K-Fold cross-validation on a Decision Tree model."""
-    
-    model = DecisionTreeRegressor(
-        max_depth=max_depth,
-        min_samples_split=min_samples_split,
-        min_samples_leaf=min_samples_leaf,
-        random_state=42
-    )
-    
-    # Perform K-Fold Cross-Validation (default cv=5)
-    scores = cross_val_score(model, X, y, cv=cv, scoring="r2")  # R² score for each fold
-    
-    print(f"Cross-Validation R² Scores: {scores}")
-    print(f"Mean R²: {np.mean(scores):.2f}")
-    print(f"Standard Deviation of R²: {np.std(scores):.2f}")
-    
-    return scores
+# Evaluate the Decision Tree Model on Test Data
+dt_metrics = evaluate_model(dt_model, X_test_pcs, y_test_pcs)
 
 
-
-# Function to evaluate the model
-def evaluate_model(model, X_test, y_test):
-    """
-    Evaluates a trained model and prints performance metrics.
-    
-    Parameters:
-        model: Trained model (DecisionTreeRegressor or other regressors).
-        X_test (DataFrame): Test feature set.
-        y_test (Series): Actual target values.
-    
-    Returns:
-        metrics (dict): Dictionary of evaluation metrics.
-    """
-    y_pred = model.predict(X_test)
-    mae = mean_absolute_error(y_test, y_pred)
-    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-    r2 = r2_score(y_test, y_pred)
-
-##    print(f"Model Evaluation Metrics:")
-##    print(f"MAE: {mae:.2f}")
-##    print(f"RMSE: {rmse:.2f}")
-##    print(f"R²: {r2:.2f}")
-
-    return {"MAE": mae, "RMSE": rmse, "R²": r2}
+######################################################################
 
 # Function to plot feature importance
 def plot_feature_importance(model, feature_names):
@@ -418,60 +406,64 @@ def plot_feature_importance(model, feature_names):
 ##
 ##
 # Run Cross-Validation Before Training Final Model
-print("\nRunning Cross-Validation for Decision Tree:")
-cross_validate_decision_tree(X_train_pcs, y_train_pcs, cv=5)
-
-# Train Decision Tree Model (After Cross-Validation)
-dt_model = train_decision_tree(X_train_pcs, y_train_pcs, max_depth=5, min_samples_split=5, min_samples_leaf=2)
-
-# Evaluate Decision Tree Model on Test Set
-dt_metrics = evaluate_model(dt_model, X_test_pcs, y_test_pcs)
-
-# Plot Feature Importance
-plot_feature_importance(dt_model, X_train_pcs.columns)
+##print("\nRunning Cross-Validation for Decision Tree:")
+##cross_validate_decision_tree(X_train_pcs, y_train_pcs, cv=5)
+##
+### Train Decision Tree Model (After Cross-Validation)
+##dt_model = train_decision_tree(X_train_pcs, y_train_pcs, max_depth=5, min_samples_split=5, min_samples_leaf=2)
+##
+### Evaluate Decision Tree Model on Test Set
+##dt_metrics = evaluate_model(dt_model, X_test_pcs, y_test_pcs)
+##
+### Plot Feature Importance
+##plot_feature_importance(dt_model, X_train_pcs.columns)
 
 ################################# Random Forest Model w/ Cross Validation #############################################
 
-def train_random_forest(X_train, y_train, max_depth=3, min_samples_split=5, min_samples_leaf=10, n_estimators=100):
-    """
-    Trains a Random Forest Regressor and returns the trained model.
+##def train_random_forest(X_train, y_train, max_depth=3, min_samples_split=5, min_samples_leaf=10, n_estimators=100):
+##    """
+##    Trains a Random Forest Regressor and returns the trained model.
+##
+##    Parameters:
+##        X_train (DataFrame): Training feature set.
+##        y_train (Series): Training target variable.
+##        max_depth (int): Maximum depth of each tree.
+##        min_samples_split (int): Minimum samples required to split a node.
+##        min_samples_leaf (int): Minimum samples required in a leaf node.
+##        n_estimators (int): Number of trees in the forest.
+##
+##    Returns:
+##        model (RandomForestRegressor): Trained Random Forest model.
+##    """
+### Add the path to cross_validation_utils.py
+##    sys.path.append(r"C:\Users\思庭\AppData\Local\Programs\Python\Python313\dataverse_files tbi Dec 2024 ML Project")
+##
+### Import LOOCV function
+##    from cross_validation_function import leave_one_out_cv
+##
+##    model = RandomForestRegressor(
+##        n_estimators=n_estimators,
+##        max_depth=max_depth,
+##        min_samples_split=min_samples_split,
+##        min_samples_leaf=min_samples_leaf,
+##        random_state=42,
+##        n_jobs=-1  # Uses all available processors
+##    )
+##    model.fit(X_train, y_train)
+##    return model
+##
+### Train the Random Forest Model
+##rf_model = train_random_forest(X_train_pcs, y_train_pcs)
+##
+### Evaluate the Random Forest Model on Test Data
+##rf_metrics = evaluate_model(rf_model, X_test_pcs, y_test_pcs)  # Ensure evaluate_model returns RMSE scores
+###print(rf_metrics) 
+### Assume rf_metrics['rmse'] contains RMSE scores for cross-validation
+##rf_rmse_scores = rf_metrics['RMSE']  # Replace with actual key where RMSE is stored
+##print(f"Random Forest Cross-Validation RMSE Scores: {rf_rmse_scores}")
+##print(f"Mean RMSE: {np.mean(rf_rmse_scores):.2f}")
+##print(f"Standard Deviation of RMSE: {np.std(rf_rmse_scores):.2f}")
 
-    Parameters:
-        X_train (DataFrame): Training feature set.
-        y_train (Series): Training target variable.
-        max_depth (int): Maximum depth of each tree.
-        min_samples_split (int): Minimum samples required to split a node.
-        min_samples_leaf (int): Minimum samples required in a leaf node.
-        n_estimators (int): Number of trees in the forest.
-
-    Returns:
-        model (RandomForestRegressor): Trained Random Forest model.
-    """
-    model = RandomForestRegressor(
-        n_estimators=n_estimators,
-        max_depth=max_depth,
-        min_samples_split=min_samples_split,
-        min_samples_leaf=min_samples_leaf,
-        random_state=42,
-        n_jobs=-1  # Uses all available processors
-    )
-    model.fit(X_train, y_train)
-    return model
-
-# Train the Random Forest Model
-rf_model = train_random_forest(X_train_pcs, y_train_pcs)
-
-# Evaluate the Random Forest Model on Test Data
-rf_metrics = evaluate_model(rf_model, X_test_pcs, y_test_pcs)
-
-from sklearn.model_selection import cross_val_score
-
-# Run Cross-Validation on Random Forest
-rf_scores = cross_val_score(rf_model, X_train_pcs, y_train_pcs, cv=5, scoring="r2")
-
-print(f"Random Forest Cross-Validation R² Scores: {rf_scores}")
-print(f"Mean R²: {np.mean(rf_scores):.2f}")
-print(f"Standard Deviation of R²: {np.std(rf_scores):.2f}")
 
 
 

@@ -7,15 +7,18 @@ from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
+import sys
+import os
+from cross_validation_function import leave_one_out_cv
 
-# 🟢 Step 1: Load Data
+# Load Data
 file_path = r"C:\Users\思庭\AppData\Local\Programs\Python\Python313\dataverse_files tbi Dec 2024 ML Project\Cleaned_Data.xlsx"
 df = pd.read_excel(file_path, sheet_name="Sheet1")
 
 
 ####################### Residual Plots Code to Determine If Feature Engineering Is Nescessary ####################
 
-##features = ["Age (Years)", "MFQ 66", "Sport"]  # Adjust based on your dataset
+##features = ["Age (Years)", "MFQ 66", "Sport"]  
 ##target = "PCS Symptom Severity (132)"
 ##
 ### Loop through each feature to check residuals
@@ -39,14 +42,13 @@ df = pd.read_excel(file_path, sheet_name="Sheet1")
 ##    plt.title(f"Residual Plot: {feature}")
 ##    plt.show()
 
+########################## LOOCV Testing #######################################
+
+sys.path.append(os.path.abspath(r"C:\Users\思庭\AppData\Local\Programs\Python\Python313\dataverse_files tbi Dec 2024 ML Project"))
 
 
 ####################### Polynomial Regression with Transformed Feature Engineering ################
 
-
-
-print(df.columns)
-# 🟢 Feature Selection: Replace Age with log(Age)
 print (df.columns)
 feature_list = ["MFQ Cut off",
                 "Learning Disability",
@@ -56,31 +58,35 @@ feature_list = ["MFQ Cut off",
                 "Anxiety Symptoms",
                 "# of Prior Depressive Episodes",
                 "Sex",
-                "Prior Depressive Episode(s) Y/N"]  # Updated feature list
+                "Prior Depressive Episode(s) Y/N"] 
 target_variable = "PCS Symptom Severity (132)"
 
-# 🟢 Extract Features and Target Variable
+# Extract Features and Target Variable
 X = df[feature_list]
 y = df[target_variable]
 
-# 🟢 Convert Data to NumPy Format
+# Convert Data to NumPy Format
 X = X.to_numpy()
 y = y.to_numpy()
 
-# 🟢 Split Data into Train & Test Sets
+# Perform LOOCV (Leave-One-Out Cross-Validation)
+model = LinearRegression()  # Initialize the model
+results = leave_one_out_cv(model, X, y)  # Run LOOCV
+print(f"LOOCV Results: Average RMSE = {results['Average RMSE']:.4f}")
+
+# Split Data into Train & Test Sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
-# 🟢 Polynomial Transformation (With Multiple Features)
-degree = 4  # Adjust as needed
+# Polynomial Transformation (With Multiple Features)
+degree = 4  
 poly = PolynomialFeatures(degree=degree, include_bias=False)
 X_poly_train = poly.fit_transform(X_train)
 X_poly_test = poly.transform(X_test)
 
-# 🟢 Train Polynomial Regression Model
-model = LinearRegression()
+# Train Polynomial Regression Model
 model.fit(X_poly_train, y_train)
 
-# 🟢 Make Predictions
+# Make Predictions
 y_train_pred = model.predict(X_poly_train)
 y_test_pred = model.predict(X_poly_test)
 
@@ -88,20 +94,20 @@ y_test_pred = model.predict(X_poly_test)
 train_rmse = np.sqrt(mean_squared_error(y_train, y_train_pred))
 test_rmse = np.sqrt(mean_squared_error(y_test, y_test_pred))
 
-# Compute R² Score
-train_r2 = r2_score(y_train, y_train_pred)
-test_r2 = r2_score(y_test, y_test_pred)
+### Compute R² Score
+##train_r2 = r2_score(y_train, y_train_pred)
+##test_r2 = r2_score(y_test, y_test_pred)
 
 # Print Evaluation Metrics
 print(f"Polynomial Regression (Degree={degree}) Evaluation Metrics:")
 print(f"Train RMSE: {train_rmse:.2f}, Test RMSE: {test_rmse:.2f}")
-print(f"Train R² Score: {train_r2:.4f}, Test R² Score: {test_r2:.4f}")
+##print(f"Train R² Score: {train_r2:.4f}, Test R² Score: {test_r2:.4f}")
 
 
-# 🟢 Compute Residuals
+# Compute Residuals
 train_residuals = y_train - y_train_pred
 test_residuals = y_test - y_test_pred
-# 🔵 Plot 1: Residuals Plot
+# Plot 1: Residuals Plot
 plt.figure(figsize=(12, 5))
 
 plt.subplot(1, 2, 1)
@@ -113,7 +119,7 @@ plt.ylabel("Residuals (Actual - Predicted)")
 plt.title("Residuals Plot")
 plt.legend()
 
-# 🔵 Plot 2: Predicted vs. Actual PCS Severity
+# Plot 2: Predicted vs. Actual PCS Severity
 plt.subplot(1, 2, 2)
 plt.scatter(y_train, y_train_pred, color='blue', alpha=0.5, label="Train Data")
 plt.scatter(y_test, y_test_pred, color='red', alpha=0.5, label="Test Data")
@@ -128,7 +134,6 @@ plt.show()
 
 
 
-
 ########################## Code For Plots From Weekend Tasks ############################################
 ##
 ##file_path = r"C:\Users\思庭\AppData\Local\Programs\Python\Python313\dataverse_files tbi Dec 2024 ML Project\Cleaned_Data.xlsx"
@@ -137,14 +142,14 @@ plt.show()
 ##print (df.columns)
 ##
 ### Define categorical and target variables
-##target_variable = "PCS Symptom Severity (132)"  # Adjust if needed
+##target_variable = "PCS Symptom Severity (132)"  
 ##categorical_variables = ["Sex", "Sport"]
 ##
 ### Step 1: Define Age Groups (Younger Teens vs. Older Teens)
 ##df["Age Group"] = pd.cut(df["Age (Years)"], bins=[0, 14, 19], labels=["Younger Teens", "Older Teens"])
 ##
 ### Step 2: Generate Scatter Plots for Numerical Features vs Target
-##numerical_features = ["Age (Years)", "MFQ 66"]  # Modify as needed
+##numerical_features = ["Age (Years)", "MFQ 66"]  
 ##
 ##for feature in numerical_features:
 ##    for cat_var in categorical_variables + ["Age Group"]:

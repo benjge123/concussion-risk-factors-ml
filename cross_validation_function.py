@@ -1,6 +1,6 @@
 # cross_validation_utils.py
 from sklearn.model_selection import LeaveOneOut
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error
 import numpy as np
 from sklearn.linear_model import LinearRegression
 import numpy as np
@@ -20,7 +20,6 @@ def leave_one_out_cv(model, X, y):
 
     loo = LeaveOneOut()
     rmse_list = []
-    r2_list = []
 
     # Perform LOOCV
     for train_index, test_index in loo.split(X):
@@ -36,27 +35,25 @@ def leave_one_out_cv(model, X, y):
         
         # Calculate metrics
         rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-        r2 = r2_score(y_test, y_pred)
         
         # Append results
         rmse_list.append(rmse)
-        r2_list.append(r2)
+
     
     # Return average metrics
     return {
         "Average RMSE": np.mean(rmse_list),
-        "Average R²": np.mean(r2_list)
     }
+############# Code To Test LOOCV Function #########################
+##X = np.array([[1], [2], [3], [4]])
+##y = np.array([2, 4, 6, 8])  # Perfect linear relationship: y = 2x
+##
+### Model
+##model = LinearRegression()
+##
+### Run LOOCV
+##results = leave_one_out_cv(model, X, y)
+##
+##print("Test Results:")
+##print(f"Average RMSE: {results['Average RMSE']}")
 
-X = np.array([[1], [2], [3], [4]])
-y = np.array([2, 4, 6, 8])  # Perfect linear relationship: y = 2x
-
-# Model
-model = LinearRegression()
-
-# Run LOOCV
-results = leave_one_out_cv(model, X, y)
-
-print("Test Results:")
-print(f"Average RMSE: {results['Average RMSE']}")
-print(f"Average R²: {results['Average R²']}")
