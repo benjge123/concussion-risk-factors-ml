@@ -10,7 +10,7 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 from sklearn.model_selection import GridSearchCV
 
 
-# Load the dataset
+# Step 1: Load the dataset
 file_path = r"C:\Users\思庭\AppData\Local\Programs\Python\Python313\dataverse_files tbi Dec 2024 ML Project\Cleaned_Data.xlsx"
 df = pd.read_excel(file_path, sheet_name="Sheet1")
 
@@ -31,7 +31,7 @@ def categorize_pcs(score):
 
 df['PCS_Category'] = df['PCS Symptom Severity (132)'].apply(categorize_pcs)
 
-# Prepare features and labels
+# Step 4: Prepare features and labels
 X = df[
     [
         "MFQ Cut off",
@@ -48,22 +48,22 @@ X = df[
 ]
 y = df['PCS_Category']
 
-# Encode categorical labels 
+# Step 5: Encode categorical labels (if necessary)
 y = y.astype('category').cat.codes
 
-# Split the data
+# Step 6: Split the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Train the Random Forest model with initial parameters
+# Step 7: Train the Random Forest model with initial parameters
 rf = RandomForestClassifier(
-    class_weight={0: 1, 1: 1.5, 2: 2, 3: 2.5, 4: 3},  
+    class_weight={0: 1, 1: 1.5, 2: 2, 3: 2.5, 4: 3},  # Adjust weights based on your analysis
     random_state=42,
     n_estimators=50,  
     max_depth=3,    
 )
 rf.fit(X_train, y_train)
 
-# Evaluate the model
+# Step 8: Evaluate the model
 y_pred = rf.predict(X_test)
 print("Classification Report:")
 print(classification_report(y_test, y_pred, zero_division=0))
@@ -72,10 +72,10 @@ accuracy = accuracy_score(y_test, y_pred)
 print(f"Accuracy: {accuracy:.2f}")
 
 
-# Hyperparameter tuning with Grid Search
+# Step 9: Hyperparameter tuning with Grid Search
 param_grid = {
-    'n_estimators': [10,20,40, 50, 100, 200,300],
-    'max_depth': [1,3,5, 10,20, None]      
+    'n_estimators': [10,20,40, 50, 100, 200,300,500],  # Number of trees in the forest
+    'max_depth': [1,3,5, 10,20, None],      # Depth of the trees
 ##    'class_weight': [
 ##        {0: 1, 1: 2, 2: 3, 3: 5, 4: 10},
 ##        {0: 1, 1: 3, 2: 5, 3: 7, 4: 10},
@@ -83,16 +83,16 @@ param_grid = {
 ##        {0: 1, 1: 5, 2: 8, 3: 12, 4: 20},
 ##        {0: 1, 1: 6, 2: 9, 3: 15, 4: 25},
 ##        'balanced',
-##        {0: 1, 1: 6, 2: 8, 3: 12, 4: 20},  
-##        {0: 1, 1: 8, 2: 10, 3: 15, 4: 25}, 
-##        {0: 1, 1: 10, 2: 12, 3: 18, 4: 30},  
+##        {0: 1, 1: 6, 2: 8, 3: 12, 4: 20},  # Prioritize rare classes
+##        {0: 1, 1: 8, 2: 10, 3: 15, 4: 25},  # Significant emphasis on minority classes
+##        {0: 1, 1: 10, 2: 12, 3: 18, 4: 30},  # Extreme prioritization of rare classes
 ##        {0: 1, 1: 12, 2: 15, 3: 20, 4: 35},
-##        {0: 1, 1: 1, 2: 1, 3: 1, 4: 1},  
-##        {0: 1, 1: 1.5, 2: 2, 3: 2.5, 4: 3},  
-##        {0: 1, 1: 2, 2: 2.5, 3: 3, 4: 4},  
-##        {0: 1, 1: 2, 2: 3, 3: 4, 4: 5},  
-    
-        }
+##        {0: 1, 1: 1, 2: 1, 3: 1, 4: 1},  # No weighting (default)
+##        {0: 1, 1: 1.5, 2: 2, 3: 2.5, 4: 3},  # Mild emphasis
+##        {0: 1, 1: 2, 2: 2.5, 3: 3, 4: 4},  # Gradual increase
+##        {0: 1, 1: 2, 2: 3, 3: 4, 4: 5},  # Stronger emphasis
+##        ]
+}
 
 grid_search = GridSearchCV(
     RandomForestClassifier(random_state=42),
@@ -111,7 +111,7 @@ print("Best Parameters:", grid_search.best_params_)
 
 
 
-### Map PCS Total Symptom Severity to categories
+### Step 3: Map PCS Total Symptom Severity to categories
 ##def categorize_pcs(score):
 ##    if score == 0:
 ##        return "None"
@@ -126,7 +126,7 @@ print("Best Parameters:", grid_search.best_params_)
 ##
 ##df['PCS_Category'] = df['PCS Symptom Severity (132)'].apply(categorize_pcs)
 ##
-### Prepare features and labels
+### Step 4: Prepare features and labels
 ##X =   df[
 ##    [   "MFQ Cut off",
 ##        "Learning Disability",
@@ -147,17 +147,17 @@ print("Best Parameters:", grid_search.best_params_)
 ##print(f"Shape of y (labels): {y.shape}")
 ##
 ##
-### Encode categorical labels 
+### Step 5: Encode categorical labels (if necessary)
 ##y = y.astype('category').cat.codes
 ##
-### Split the data
+### Step 6: Split the data
 ##X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 ##
-### Train the Decision Tree model
+### Step 7: Train the Decision Tree model
 ##clf = DecisionTreeClassifier(class_weight={0: 1, 1: 6, 2: 2.5, 3: 4, 4:7}, random_state=42)
 ##clf.fit(X_train, y_train)
 ##
-### Evaluate the model
+### Step 8: Evaluate the model
 ##y_pred = clf.predict(X_test)
 ##print("Classification Report:")
 ##print(classification_report(y_test, y_pred))
@@ -184,7 +184,7 @@ print("Best Parameters:", grid_search.best_params_)
 ##
 ##
 ##
-### Visualize the Decision Tree
+### Step 9: Visualize the Decision Tree
 ####plt.figure(figsize=(20,10))
 ####tree.plot_tree(clf, feature_names=X.columns, class_names=['Mild', 'Moderate', 'Severe', 'Very Severe'], filled=True)
 ####plt.show()

@@ -35,6 +35,9 @@ Go to 'Code" to view with formatting.
 20. LOOCV on my RF model had better results too, with a RMSE of 19.78 and r^2 of 0.28. r^2 is a double what it was previously. I didn't record what RMSE of non-LOOCV model was.
 21. LOOCV on DT model also improved it significantly. New RSME: 17.88 and r^2: 0.41.
 22. Couldn't figure out how to correctly plot a learning curve for LOOCV poly regression
+23. Built a classification DT model. 5 classes with none, mild, moderate, severe, and very severe classes. Uses grid search to help find optimal weights for the classes since there's many "none" data points and few severs/very severe data points. Model still meh, 0.55 accuracy after messing with class weights
+24. Built a RF model and got a 0.5 accuracy. DT and RF still struggle to predict on the severe and very severe classes, with both being unable to predict them even after heavily weighting their classes
+
 
 
 22. How do i go about ordering my code? I now have different models in different files so what's best for combining everything?
