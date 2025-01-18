@@ -10,6 +10,7 @@ from sklearn.metrics import r2_score
 import sys
 import os
 from cross_validation_function import leave_one_out_cv
+from sklearn.model_selection import learning_curve
 
 # Load Data
 file_path = r"C:\Users\思庭\AppData\Local\Programs\Python\Python313\dataverse_files tbi Dec 2024 ML Project\Cleaned_Data.xlsx"
@@ -58,7 +59,8 @@ feature_list = ["MFQ Cut off",
                 "Anxiety Symptoms",
                 "# of Prior Depressive Episodes",
                 "Sex",
-                "Prior Depressive Episode(s) Y/N"] 
+                "Prior Depressive Episode(s) Y/N",
+                "Age (Years)"] 
 target_variable = "PCS Symptom Severity (132)"
 
 # Extract Features and Target Variable
@@ -130,6 +132,48 @@ plt.title("Predicted vs Actual PCS Severity")
 plt.legend()
 
 plt.tight_layout()
+plt.show()
+
+# Plot 3: Learning Curve
+train_sizes = np.linspace(0.1, 1.0, 10)  # Define fractions of the training set
+train_rmse_list = []
+test_rmse_list = []
+
+for train_size in train_sizes:
+    # Sample a subset of the training data
+    subset_size = int(train_size * len(X_train))
+    X_subset = X_train[:subset_size]
+    y_subset = y_train[:subset_size]
+
+    # Polynomial Transformation for Subset
+    X_poly_subset = poly.fit_transform(X_subset)
+    X_poly_full_train = poly.transform(X_train)
+    X_poly_test = poly.transform(X_test)
+
+    # Train the Model on Subset
+    model.fit(X_poly_subset, y_subset)
+
+    # Predict on Full Training Set and Test Set
+    y_train_pred = model.predict(X_poly_full_train)
+    y_test_pred = model.predict(X_poly_test)
+
+    # Calculate RMSE
+    train_rmse = np.sqrt(mean_squared_error(y_train, y_train_pred))
+    test_rmse = np.sqrt(mean_squared_error(y_test, y_test_pred))
+
+    # Append RMSE to Lists
+    train_rmse_list.append(train_rmse)
+    test_rmse_list.append(test_rmse)
+
+# Plot the Learning Curve
+plt.figure(figsize=(8, 6))
+plt.plot(train_sizes * len(X_train), train_rmse_list, label="Train RMSE", marker='o')
+plt.plot(train_sizes * len(X_train), test_rmse_list, label="Test RMSE", marker='o')
+plt.xlabel("Training Set Size")
+plt.ylabel("RMSE")
+plt.title(f"Learning Curve (Polynomial Regression, Degree={degree})")
+plt.legend()
+plt.grid()
 plt.show()
 
 

@@ -31,8 +31,14 @@ Go to 'Code" to view with formatting.
 16. Started on polynomial regression to help see the bias-variance tradeoff and find what degree polynomial results in the best polynomial regression.
 17. Got stuck on if my polynomial regression model is correct.
 18. Finished my LOOCV function, i think. Have yet to test it.
-19. Got a new laptop, do I need to add this laptop to GitHub or something?
+19. Tested LOOCV function of degree 4 polynomial regress. Got a RMSE of 7.9605 compared to train-test-split RMSE of 10.85. Improvement, yes?
+20. LOOCV on my RF model had better results too, with a RMSE of 19.78 and r^2 of 0.28. r^2 is a double what it was previously. I didn't record what RMSE of non-LOOCV model was.
+21. LOOCV on DT model also improved it significantly. New RSME: 17.88 and r^2: 0.41.
+22. Couldn't figure out how to correctly plot a learning curve for LOOCV poly regression
 
+
+22. How do i go about ordering my code? I now have different models in different files so what's best for combining everything?
+19. Got a new laptop, do I need to add this laptop to GitHub or something?
 
 12. I just realized that you recommend I create a separate file with plots from my models, right?
 
