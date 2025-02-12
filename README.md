@@ -54,13 +54,18 @@ To Consider Later
 3. "So given your answers to your past medical history, PCS, and MFQ scores, here's a loose projection of what your near future could look like" - if this model were to be turned into a tool to be used in practice, this is a situation where it could help a patient have a more detailed understanding of their next few weeks. It beats "try to rest and cross your fingers you get better" 
 4. Should I remove the cases where PCS = 0? There's 43/155 who do not have and Post Concussion Sypmtoms, so I wonder if it's making my model worse by have the largest population of the data be people with 0 symptoms. I am also unsure if my SMOTE over sampling is working the way it should....
 5. Is it bad that MFQ cut off is included since MFQ scores has a 0.78 with PCS scores? If removed, r^2 drops to ~0.11, far worse than ~0.5
-6. If I still want to do resampling, Leave one out cross validation can be done first
-7. Jen Weekend Email Plan
-	-Take a look at data from different angles to better understand questions I can answer w data
-	-Think about normalizing or standardizing features
-	-Try feature engineering and retry the polynomial regression w feature engineering
-		-Figure out what linear algerbra she's talking about means
-	-Give classification a shot. Read the textbook about classification first?
-	-Figure out what the criteria of "What a working model" is
-	-Can switch to answering her short answer questions if I get stuck or need a break
+6. Potentially pivoting to another idea using the same data but incorporating some NLP. Showed some promise.
+7. Put together a small write up at the end and mentioned I tried scaling to standardize features but I removed it since it didn't work.
+
+Post break tasks
+-Learning curve plotting model complexity as x axis
+-two tailed t test for gender/sports. Is there a difference between genders or sports for MFQ/PCS results? leaning towards unpaired samples t test
+-Answer these for resampling
+	What is resampling? When would you use it?
+	What is data augmentation?
+	What are the primary differences between resampling and data augmentation?
+	Is there any overlap between the two?
+	List at least 4 resampling methods.
+	What are their pros/cons?
+	Which one is appropriate for your model? (open ended.)
 
