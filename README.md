@@ -36,7 +36,8 @@ Go to 'Code" to view with formatting.
 21. LOOCV on DT model also improved it significantly. New RSME: 17.88 and r^2: 0.41.
 22. Couldn't figure out how to correctly plot a learning curve for LOOCV poly regression
 23. Built a classification DT model. 5 classes with none, mild, moderate, severe, and very severe classes. Uses grid search to help find optimal weights for the classes since there's many "none" data points and few severs/very severe data points. Model still meh, 0.55 accuracy after messing with class weights
-24. Built a RF model and got a 0.5 accuracy. DT and RF still struggle to predict on the severe and very severe classes, with both being unable to predict them even after heavily weighting their classes
+24. Built a classification RF model and got a 0.5 accuracy. DT and RF still struggle to predict on the severe and very severe classes, with both being unable to predict them even after heavily weighting their classes
+25. Plotted Learning curves with model complexity as the x variable 
 
 
 
@@ -68,4 +69,10 @@ Post break tasks
 	List at least 4 resampling methods.
 	What are their pros/cons?
 	Which one is appropriate for your model? (open ended.)
+- I'm wondering if this is due to the stochastic nature of choosing a set of training examples. (How did you select which training examples to include at every x-increment? Are the training examples used for every train set size independent from one another?)
+image.png
+ 
+That would have been my initial guess. But if you observed that they made your models worse, then best to drop!
+If you include these statistics (regarding age and avg mfq) in a report, make sure to include some sort of error or confidence intervals on these measurements.(In this case, it can be standard deviation.)
+
 

@@ -8,6 +8,9 @@ from sklearn import tree
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import roc_curve, auc
+from sklearn.preprocessing import label_binarize
+from itertools import cycle
 
 
 # Load the dataset
@@ -93,7 +96,34 @@ df = pd.read_excel(file_path, sheet_name="Sheet1")
 ##plt.legend()
 ##plt.grid(True)
 ##plt.show()
-
+##
+##
+################### Plotting ROC 
+##
+### Binarize the output for multi-class classification
+##n_classes = len(np.unique(y))  # Get number of unique classes
+##y_test_bin = label_binarize(y_test, classes=np.arange(n_classes))
+##y_score = rf.predict_proba(X_test)  # Get probability estimates for each class
+##
+### Plot ROC curve for each class
+##plt.figure(figsize=(10, 7))
+##colors = cycle(["blue", "red", "green", "purple", "orange"])  # Colors for each class
+##
+##for i, color in zip(range(n_classes), colors):
+##    fpr, tpr, _ = roc_curve(y_test_bin[:, i], y_score[:, i])
+##    roc_auc = auc(fpr, tpr)
+##    
+##    plt.plot(fpr, tpr, color=color, lw=2, label=f'Class {i} (AUC = {roc_auc:.2f})')
+##
+### Plot diagonal line (random classifier)
+##plt.plot([0, 1], [0, 1], "k--", lw=2)
+##
+##plt.xlabel("False Positive Rate")
+##plt.ylabel("True Positive Rate")
+##plt.title("ROC Curve for Multi-Class Random Forest")
+##plt.legend(loc="lower right")
+##plt.grid()
+##plt.show()
 
 ########### Hyperparameter tuning with Grid Search
 ##param_grid = {
@@ -204,6 +234,31 @@ plt.ylabel("Accuracy")
 plt.title("Decision Tree Learning Curve: Accuracy vs. Model Complexity")
 plt.legend()
 plt.grid(True)
+plt.show()
+
+# Binarize the output for multi-class classification
+n_classes = len(np.unique(y))  # Get number of unique classes
+y_test_bin = label_binarize(y_test, classes=np.arange(n_classes))
+y_score = clf.predict_proba(X_test)  # Get probability estimates for each class
+
+# Plot ROC curve for each class
+plt.figure(figsize=(10, 7))
+colors = cycle(["blue", "red", "green", "purple", "orange"])  # Colors for each class
+
+for i, color in zip(range(n_classes), colors):
+    fpr, tpr, _ = roc_curve(y_test_bin[:, i], y_score[:, i])
+    roc_auc = auc(fpr, tpr)
+    
+    plt.plot(fpr, tpr, color=color, lw=2, label=f'Class {i} (AUC = {roc_auc:.2f})')
+
+# Plot diagonal line (random classifier)
+plt.plot([0, 1], [0, 1], "k--", lw=2)
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve for Multi-Class Decision Tree")
+plt.legend(loc="lower right")
+plt.grid()
 plt.show()
 
 ################### Code to train and visualize the DT Model
